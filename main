@@ -1,0 +1,164 @@
+//This program creates a deck of cards with a set number 
+// of suits and values.  
+
+var SUITS = 4
+var VALUES = 13
+var CARDS_IN_HAND = 5
+var TRIALS = 1000000
+var flushCount = 0;
+var stFlushCount = 0;
+var royalFlushCount = 0;
+var NUM_TRIALS = 0;
+var straightCount = 0;
+var fourKind = 0;
+var fullHouse = 0;
+var threeKind = 0;
+var twoPair = 0;
+var pair = 0;
+var high = 0;
+
+function start() {
+ 
+    // The program deals hands of cards until it deals a Royal Flush
+    // A royal flush is 10,J,Q,K,A in one suit. Along the way it counts
+    // the number of all other results. The hands are listed in order
+    // of rank from lowest to highest in the game.
+    
+    while (royalFlushCount < 1) {
+        var mainDeck = buildDeck(SUITS,VALUES);
+        var myHand = deal(mainDeck,CARDS_IN_HAND);
+        
+       handCheck(myHand);
+       NUM_TRIALS++;
+    }
+    
+   
+   
+    
+    println("Hands = " + NUM_TRIALS);
+    println("High Card Only = " + high);
+    println("Pairs = " + pair);
+    println("Two Pair = " + twoPair);
+    println("Three of a Kind = " + threeKind);
+    println("Straights = " + (straightCount));
+    println("Flush = " + flushCount);
+    println("Full House = " + fullHouse);
+    println("4 of a Kind = " + fourKind);
+    println("Straight Flush = " + stFlushCount);
+    println("Royal Flush = " + royalFlushCount);
+
+    
+}    
+
+function handCheck(list) {
+    var suitList = [];
+    var valueList = [];
+    for (var i = 0; i < CARDS_IN_HAND; i++) {
+        suitList.push(list[i][0]);
+        valueList.push(list[i][1]);
+        
+    } 
+    
+// Flush Test
+    var i = 0;
+    var counter = 0;
+    while (suitList[i]==suitList[i+1]) {
+        counter++;
+        i++
+      
+    }
+    if (counter == 4) {
+        
+        flushCheck(valueList);
+        
+    }else{
+    
+    // Straight Test
+        var sortList = valueList.sort();
+        var i = 0;
+        var counter = 0;
+        while (sortList[i+1] == sortList[i] + 1){
+            counter++;
+            i++;
+        }
+        if ((sortList[0] == 1 && sortList[1] == 10 && sortList[2] == 11 
+            && sortList[3] == 12 && sortList[4] == 13) || counter == 4){
+                straightCount++
+        }
+    }
+    // Mutiple Value Tests
+    
+    var orderedValues = valueList.sort();
+    if ((orderedValues[0]==orderedValues[1]&&orderedValues[1]==orderedValues[2]
+          &&orderedValues[2]==orderedValues[3])||(orderedValues[1]==orderedValues[2]&&orderedValues[3]==orderedValues[4]
+          &&orderedValues[2]==orderedValues[3])) {
+        fourKind++;
+              
+    }else if ((orderedValues[0]==orderedValues[1]&&orderedValues[1]==orderedValues[2]
+               && orderedValues[3] == orderedValues[4])||(orderedValues[3]==orderedValues[4]&&orderedValues[2]==orderedValues[3]&&orderedValues[0]==orderedValues[1]))
+               {
+        fullHouse++;
+    }else if ((orderedValues[0]==orderedValues[1]&&orderedValues[1]==orderedValues[2]&&orderedValues[3]!=orderedValues[4])||
+                (orderedValues[2]==orderedValues[3]&&orderedValues[1]==orderedValues[2]&&orderedValues[0]!=orderedValues[4])||
+                  (orderedValues[2]==orderedValues[3]&&orderedValues[3]==orderedValues[4]&&orderedValues[0]!=orderedValues[1]))
+                {
+        threeKind++;            
+    }else if ((orderedValues[0]==orderedValues[1]&&orderedValues[2]==orderedValues[3])||
+               (orderedValues[0]==orderedValues[1]&&orderedValues[3]==orderedValues[4])||
+               (orderedValues[1]==orderedValues[2]&&orderedValues[3]==orderedValues[4]))
+               {
+                   twoPair++
+    }else if (orderedValues[0]==orderedValues[1]||orderedValues[2]==orderedValues[1]||orderedValues[2]==orderedValues[3]||orderedValues[3]==orderedValues[4])
+               {
+                   pair++;
+    }else {
+        high++;
+    }
+               
+}
+    
+// If a hand is a flush this looks for straight flush 
+function flushCheck(list) {
+    var sortList = list.sort();
+    var i = 0;
+    var counter = 0;
+    while (sortList[i+1] == sortList[i] + 1){
+           counter++;
+           i++;
+    }
+        
+    if (list[0] == 1 && list[1] == 10 && list[2] == 11 
+        && list[3] == 12 && list[4] == 13) {
+        royalFlushCount++;
+    }else if (counter == 4) {
+        stFlushCount++;    
+    }else{
+        flushCount++;
+    }
+    
+}
+
+// This function builds a deck of cards
+function buildDeck(suits, values){
+    var deck = [];
+    for (var i = 1; i <= suits; i++) {
+        for (var k = 1; k <= values; k++) {
+            deck.push([i,k]);
+        }
+    }
+    return deck;
+}
+
+// This function deals the cards from the deck.  Note that
+// it removes the card from the deck each time.
+
+function deal(deck,cards){
+    var hand = [];
+    var nextCard;
+    for (var i = 0; i < cards ; i++) {
+        nextCard = Randomizer.nextInt(0,deck.length-1);
+        hand.push(deck[nextCard]);
+        deck.remove(nextCard);
+    }
+     return hand;
+}
